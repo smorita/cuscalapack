@@ -16,17 +16,44 @@ ScaLAPACKの行列積演算 `pdgemm`, `pzgemm` をGPUで計算するライブラ
 適切なモジュールをロードした上で `make` すると，静的ライブラリ `libcuscalapack.a` が作成されます．
 
 
-## 利用方法
+## リンク方法
 
 Intel MKLよりも前に `libcuscalapack.a` をリンクして下さい．また，CUDA RuntimeとcuBLASもリンクする必要があります．
 
-### 例
+### Makefileの例
 
 ```Makefile
 LDFLAGS = -lcudart -lcublas
 LDFLAGS += -lmkl_scalapack_lp64 -lmkl_blacs_sgimpt_lp64 -mkl=parallel -lmpi
 
 mpicxx main.cc libcuscalapack.a ${LDFLAGS}
+```
+
+
+## 1ノード内で複数のGPUを使用する場合
+
+1ノードに複数のMPIプロセスを立ち上げることで，複数のGPUを使用することができます．ただし，その際には `cudaSetDevice` により各プロセスにどのGPUを使用するか指定する必要があります．
+
+```C
+int mpirank;
+int numdevices;
+MPI_Init(&argc, &argv);
+MPI_Comm_rank(MPI_COMM_WORLD, &mpirank);
+cudaError_t errorId = cudaGetDeviceCount(&numdevices);
+if (errorId != cudaSuccess) exit(EXIT_FAILURE);
+cudaSetDevice( mpirank % numdevices );
+```
+
+また， `cuscalapack.h` で宣言された `init_cuscalapack()` を呼び出すことで，上記コードと同じ作業をすることが可能です．
+
+```C
+#include "cuscalapack.h"
+
+int main(int argc, char **argv) {
+    init_cuscalapack();
+
+    ...
+}
 ```
 
 
