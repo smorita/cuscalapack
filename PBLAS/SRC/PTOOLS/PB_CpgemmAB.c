@@ -18,13 +18,13 @@
 #include "../PB_cuBLAS.h"
 
 #ifdef __STDC__
-void PB_CpgemmAB( PBTYP_T * TYPE, char * DIRECA, char * DIRECB,
+void cuPB_CpgemmAB( PBTYP_T * TYPE, char * DIRECA, char * DIRECB,
                   char * TRANSA, char * TRANSB, int M, int N, int K,
                   char * ALPHA, char * A, int IA, int JA, int * DESCA,
                   char * B, int IB, int JB, int * DESCB, char * BETA,
                   char * C, int IC, int JC, int * DESCC )
 #else
-void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
+void cuPB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
                   A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
                   DESCC )
 /*
@@ -342,78 +342,78 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
    if( !( PB_Cspan( K, AiR, AinbR, AnbR, AsrcR, AnprocsR ) ) &&
        !( PB_Cspan( K, BiR, BinbR, BnbR, BsrcR, BnprocsR ) ) )
    {
-      PB_CInV( TYPE, &TrA, COLUMN, M, N, Cd0, K, A, IA, JA, DESCA, &Aroc, &WA,
+      cuPB_CInV( TYPE, &TrA, COLUMN, M, N, Cd0, K, A, IA, JA, DESCA, &Aroc, &WA,
                WAd0, &WAfr );
-      PB_CInV( TYPE, &TrB, ROW,    M, N, Cd0, K, B, IB, JB, DESCB, &Broc, &WB,
+      cuPB_CInV( TYPE, &TrB, ROW,    M, N, Cd0, K, B, IB, JB, DESCB, &Broc, &WB,
                WBd0, &WBfr );
       if( ( Cmp > 0 ) && ( Cnq > 0 ) )
       {
 /*
 *  Perform the local update if I own some of sub( C )
 */
-		 // for cuBLAS
-         switch(TYPE->type)
-		 {
-			 case 'D':
-				 // Allocate
-				 if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(double)*Cmp*K  )))  return;
-		 		 if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(double)*K*Cnq  )))  return;
-				 if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(double)*Cmp*Cnq)))  return;
+        // for cuBLAS
+        switch(TYPE->type)
+          {
+          case 'D':
+            // Allocate
+            if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(double)*Cmp*K  )))  return;
+            if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(double)*K*Cnq  )))  return;
+            if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(double)*Cmp*Cnq)))  return;
 
-				 // HtoD
-		 		 if(!checkCublasErrors(cublasSetMatrix(Cmp, K  , sizeof(double), WA, WAd0[LLD_], (double*)d_A, Cmp))) return;
-				 if(!checkCublasErrors(cublasSetMatrix(K  , Cnq, sizeof(double), WB, WBd0[LLD_], (double*)d_B, K  ))) return;
-				 if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(double), Mptr( C, Cii, Cjj, Cld, size ), Cld, (double*)d_C, Cmp))) return;
+            // HtoD
+            if(!checkCublasErrors(cublasSetMatrix(Cmp, K  , sizeof(double), WA, WAd0[LLD_], (double*)d_A, Cmp))) return;
+            if(!checkCublasErrors(cublasSetMatrix(K  , Cnq, sizeof(double), WB, WBd0[LLD_], (double*)d_B, K  ))) return;
+            if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(double), Mptr( C, Cii, Cjj, Cld, size ), Cld, (double*)d_C, Cmp))) return;
 
-				 // Run
-		 		 if(!checkCublasErrors(cublasDgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
-						                           Cmp, Cnq, K,
-   									               (double*)ALPHA, (double*)d_A, Cmp,
-									                               (double*)d_B, K,
-  	                                               (double*)BETA,  (double*)d_C, Cmp)))    return;
+            // Run
+            if(!checkCublasErrors(cublasDgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
+                                              Cmp, Cnq, K,
+                                              (double*)ALPHA, (double*)d_A, Cmp,
+                                              (double*)d_B, K,
+                                              (double*)BETA,  (double*)d_C, Cmp)))    return;
 
-				 // DtoH
-				 if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(double), (double*)d_C, Cmp, Mptr( C, Cii, Cjj, Cld, size ), Cld))) return;
+            // DtoH
+            if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(double), (double*)d_C, Cmp, Mptr( C, Cii, Cjj, Cld, size ), Cld))) return;
 
-				 // Deallocate
-			     cudaFree(d_A);
-		 		 cudaFree(d_B);
-				 cudaFree(d_C);
-				 break;
-			 case 'Z':
-				 // Allocate
-				 if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(cuDoubleComplex)*Cmp*K  )))  return;
-		 		 if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(cuDoubleComplex)*K*Cnq  )))  return;
-				 if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(cuDoubleComplex)*Cmp*Cnq)))  return;
+            // Deallocate
+            cudaFree(d_A);
+            cudaFree(d_B);
+            cudaFree(d_C);
+            break;
+          case 'Z':
+            // Allocate
+            if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(cuDoubleComplex)*Cmp*K  )))  return;
+            if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(cuDoubleComplex)*K*Cnq  )))  return;
+            if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(cuDoubleComplex)*Cmp*Cnq)))  return;
 
-				 // HtoD
-		 		 if(!checkCublasErrors(cublasSetMatrix(Cmp, K  , sizeof(cuDoubleComplex), WA, WAd0[LLD_], (cuDoubleComplex*)d_A, Cmp))) return;
-				 if(!checkCublasErrors(cublasSetMatrix(K  , Cnq, sizeof(cuDoubleComplex), WB, WBd0[LLD_], (cuDoubleComplex*)d_B, K  ))) return;
-				 if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), Mptr( C, Cii, Cjj, Cld, size ), Cld, (cuDoubleComplex*)d_C, Cmp))) return;
+            // HtoD
+            if(!checkCublasErrors(cublasSetMatrix(Cmp, K  , sizeof(cuDoubleComplex), WA, WAd0[LLD_], (cuDoubleComplex*)d_A, Cmp))) return;
+            if(!checkCublasErrors(cublasSetMatrix(K  , Cnq, sizeof(cuDoubleComplex), WB, WBd0[LLD_], (cuDoubleComplex*)d_B, K  ))) return;
+            if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), Mptr( C, Cii, Cjj, Cld, size ), Cld, (cuDoubleComplex*)d_C, Cmp))) return;
 
-				 // Run
-		 		 if(!checkCublasErrors(cublasZgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
-						                           Cmp, Cnq, K,
-   									               (cuDoubleComplex*)ALPHA, (cuDoubleComplex*)d_A, Cmp,
-									                                        (cuDoubleComplex*)d_B, K,
-  	                                               (cuDoubleComplex*)BETA , (cuDoubleComplex*)d_C, Cmp)))    return;
+            // Run
+            if(!checkCublasErrors(cublasZgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
+                                              Cmp, Cnq, K,
+                                              (cuDoubleComplex*)ALPHA, (cuDoubleComplex*)d_A, Cmp,
+                                              (cuDoubleComplex*)d_B, K,
+                                              (cuDoubleComplex*)BETA , (cuDoubleComplex*)d_C, Cmp)))    return;
 
-				 // DtoH
-				 if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), (cuDoubleComplex*)d_C, Cmp, Mptr( C, Cii, Cjj, Cld, size ), Cld))) return;
+            // DtoH
+            if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), (cuDoubleComplex*)d_C, Cmp, Mptr( C, Cii, Cjj, Cld, size ), Cld))) return;
 
-				 // Deallocate
-			     cudaFree(d_A);
-		 		 cudaFree(d_B);
-				 cudaFree(d_C);
-				 break;
-			 default:
-				 break;
-		 }
-         cublasDestroy(handle);
+            // Deallocate
+            cudaFree(d_A);
+            cudaFree(d_B);
+            cudaFree(d_C);
+            break;
+          default:
+            break;
+          }
+        cublasDestroy(handle);
 
-//         TYPE->Fgemm( C2F_CHAR( NOTRAN ), C2F_CHAR( NOTRAN ), &Cmp, &Cnq, &K,
-//                      ALPHA, WA, &WAd0[LLD_], WB, &WBd0[LLD_], BETA, Mptr( C,
-//                      Cii, Cjj, Cld, size ), &Cld );
+        //         TYPE->Fgemm( C2F_CHAR( NOTRAN ), C2F_CHAR( NOTRAN ), &Cmp, &Cnq, &K,
+        //                      ALPHA, WA, &WAd0[LLD_], WB, &WBd0[LLD_], BETA, Mptr( C,
+        //                      Cii, Cjj, Cld, size ), &Cld );
 
 
       }
@@ -497,8 +497,8 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
 /*
 *  Allocate work space in process rows and columns spanned by sub( C )
 */
-   PB_COutV( TYPE, COLUMN, NOINIT, M, N, Cd0, kb, &WA, WAd0, &WAfr, &WAsum );
-   PB_COutV( TYPE, ROW,    NOINIT, M, N, Cd0, kb, &WB, WBd0, &WBfr, &WBsum );
+   cuPB_COutV( TYPE, COLUMN, NOINIT, M, N, Cd0, kb, &WA, WAd0, &WAfr, &WAsum );
+   cuPB_COutV( TYPE, ROW,    NOINIT, M, N, Cd0, kb, &WB, WBd0, &WBfr, &WBsum );
 /*
 *  Loop over the virtual process grid induced by the sub( A ) and sub( B )
 */
@@ -528,23 +528,23 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
       switch(TYPE->type)
       {
          case 'D':
-		    // Allocate
-			if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(double)*Cmp*kb)))  return;
-			if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(double)*kb*Cnq)))  return;
-			if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(double)*Cmp*Cnq)))    return;
-			// HtoD
-			if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(double), Cptr, Cld, (double*)d_C, Cmp))) return;
-		   	break;
-	     case 'Z':
-		    // Allocate
-		    if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(cuDoubleComplex)*Cmp*kb)))  return;
-		    if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(cuDoubleComplex)*kb*Cnq)))  return;
-		    if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(cuDoubleComplex)*Cmp*Cnq)))    return;
-		    // HtoD
-		    if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), Cptr, Cld, (cuDoubleComplex*)d_C, Cmp))) return;
-		    break;
-	     default:
-		    break;
+        // Allocate
+      if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(double)*Cmp*kb)))  return;
+      if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(double)*kb*Cnq)))  return;
+      if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(double)*Cmp*Cnq)))    return;
+      // HtoD
+      if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(double), Cptr, Cld, (double*)d_C, Cmp))) return;
+        break;
+       case 'Z':
+        // Allocate
+        if(!checkCudaErrors(cudaMalloc((void**)&d_A, sizeof(cuDoubleComplex)*Cmp*kb)))  return;
+        if(!checkCudaErrors(cudaMalloc((void**)&d_B, sizeof(cuDoubleComplex)*kb*Cnq)))  return;
+        if(!checkCudaErrors(cudaMalloc((void**)&d_C, sizeof(cuDoubleComplex)*Cmp*Cnq)))    return;
+        // HtoD
+        if(!checkCublasErrors(cublasSetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), Cptr, Cld, (cuDoubleComplex*)d_C, Cmp))) return;
+        break;
+       default:
+        break;
       }
    }
 
@@ -608,7 +608,7 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
                Abufld = MAX( 1, AnpD );
                if( AisR || ( AmyprocR == AcurrocR ) )
                {
-                  Abuf = PB_Cmalloc( AnpD * ABrocs * size );
+                  Abuf = cuPB_Cmalloc( AnpD * ABrocs * size );
                   PB_CVMpack( TYPE, &VM, COLUMN, &Aroc, PACKING, NOTRAN,
                               ABrocs, AnpD, one, Mptr( A, AiiD, AkkR, Ald,
                               size ), Ald, zero, Abuf, Abufld );
@@ -641,7 +641,7 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
                Abufld = ABrocs;
                if( AisR || ( AmyprocR == AcurrocR ) )
                {
-                  Abuf = PB_Cmalloc( AnpD * ABrocs * size );
+                  Abuf = cuPB_Cmalloc( AnpD * ABrocs * size );
                   PB_CVMpack( TYPE, &VM, COLUMN, &Aroc, PACKING, NOTRAN,
                               ABrocs, AnpD, one, Mptr( A, AkkR, AiiD, Ald,
                               size ), Ald, zero, Abuf, Abufld );
@@ -675,7 +675,7 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
                Bbufld = ABrocs;
                if( BisR || ( BmyprocR == BcurrocR ) )
                {
-                  Bbuf = PB_Cmalloc( BnpD * ABrocs * size );
+                  Bbuf = cuPB_Cmalloc( BnpD * ABrocs * size );
                   PB_CVMpack( TYPE, &VM, ROW,    &Broc, PACKING, NOTRAN,
                               ABrocs, BnpD, one, Mptr( B, BkkR, BiiD, Bld,
                               size ), Bld, zero, Bbuf, Bbufld );
@@ -708,7 +708,7 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
                Bbufld = MAX( 1, BnpD );
                if( BisR || ( BmyprocR == BcurrocR ) )
                {
-                  Bbuf = PB_Cmalloc( BnpD * ABrocs * size );
+                  Bbuf = cuPB_Cmalloc( BnpD * ABrocs * size );
                   PB_CVMpack( TYPE, &VM, ROW,    &Broc, PACKING, NOTRAN,
                               ABrocs, BnpD, one, Mptr( B, BiiD, BkkR, Bld,
                               size ), Bld, zero, Bbuf, Bbufld );
@@ -734,9 +734,9 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
 *  Replicate panels of rows or columns of sub( A ) and sub( B ) over sub( C )
 *  -> WA, WB
 */
-         PB_CInV2( TYPE, &TrA, COLUMN, M, N, Cd0, ABrocs, Abuf, 0, 0,
+         cuPB_CInV2( TYPE, &TrA, COLUMN, M, N, Cd0, ABrocs, Abuf, 0, 0,
                    DBUFA, &Aroc, WA, Wkbb, WAd0 );
-         PB_CInV2( TYPE, &TrB, ROW,    M, N, Cd0, ABrocs, Bbuf, 0, 0,
+         cuPB_CInV2( TYPE, &TrB, ROW,    M, N, Cd0, ABrocs, Bbuf, 0, 0,
                    DBUFB, &Broc, WB, Wkbb, WBd0 );
 
          if( Afr & ( AisR || ( AmyprocR == AcurrocR ) ) )
@@ -755,48 +755,43 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
 *  Perform local update
 */
       if( Cmp > 0 && Cnq > 0 )
-      {
-		  // for cuBLAS
-		  switch(TYPE->type)
-		  {
-			  case 'D':
+        {
+          // for cuBLAS
+          switch(TYPE->type)
+            {
+            case 'D':
+              // HtoD
+              if(!checkCublasErrors(cublasSetMatrix(Cmp, kbb, sizeof(double), WA, WAd0[LLD_], (double*)d_A, Cmp))) return;
+              if(!checkCublasErrors(cublasSetMatrix(kbb, Cnq, sizeof(double), WB, WBd0[LLD_], (double*)d_B, kbb))) return;
+              // Run
+              if(!checkCublasErrors(cublasDgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
+                                                Cmp, Cnq, kbb,
+                                                (double*)ALPHA, (double*)d_A, Cmp,
+                                                (double*)d_B, kbb,
+                                                (double*)tbeta, (double*)d_C, Cmp)))    return;
+              break;
 
-				  // HtoD
-		 		  if(!checkCublasErrors(cublasSetMatrix(Cmp, kbb, sizeof(double), WA, WAd0[LLD_], (double*)d_A, Cmp))) return;
-				  if(!checkCublasErrors(cublasSetMatrix(kbb, Cnq, sizeof(double), WB, WBd0[LLD_], (double*)d_B, kbb))) return;
+            case 'Z':
+              // HtoD
+              if(!checkCublasErrors(cublasSetMatrix(Cmp, kbb, sizeof(cuDoubleComplex), WA, WAd0[LLD_], (cuDoubleComplex*)d_A, Cmp))) return;
+              if(!checkCublasErrors(cublasSetMatrix(kbb, Cnq, sizeof(cuDoubleComplex), WB, WBd0[LLD_], (cuDoubleComplex*)d_B, kbb))) return;
+              // Run
+              if(!checkCublasErrors(cublasZgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
+                                                Cmp, Cnq, kbb,
+                                                (cuDoubleComplex*)ALPHA, (cuDoubleComplex*)d_A, Cmp,
+                                                (cuDoubleComplex*)d_B, kbb,
+                                                (cuDoubleComplex*)tbeta, (cuDoubleComplex*)d_C, Cmp)))    return;
+              break;
 
-				  // Run
-		 		  if(!checkCublasErrors(cublasDgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
-						                            Cmp, Cnq, kbb,
-   										            (double*)ALPHA, (double*)d_A, Cmp,
-									                                (double*)d_B, kbb,
-  	                                                (double*)tbeta, (double*)d_C, Cmp)))    return;
-		   
-				  break;
-			  case 'Z':
+            default:
+              break;
+            }
 
-                  // HtoD
-		 		  if(!checkCublasErrors(cublasSetMatrix(Cmp, kbb, sizeof(cuDoubleComplex), WA, WAd0[LLD_], (cuDoubleComplex*)d_A, Cmp))) return;
-				  if(!checkCublasErrors(cublasSetMatrix(kbb, Cnq, sizeof(cuDoubleComplex), WB, WBd0[LLD_], (cuDoubleComplex*)d_B, kbb))) return;
+          //         gemm( C2F_CHAR( NOTRAN ), C2F_CHAR( NOTRAN ), &Cmp, &Cnq, &kbb,
+          //               ALPHA, WA, &WAd0[LLD_], WB, &WBd0[LLD_], tbeta, Cptr, &Cld );
 
-				  // Run
-		 		  if(!checkCublasErrors(cublasZgemm(handle, cublas_trans_const(NOTRAN), cublas_trans_const(NOTRAN),
-						                            Cmp, Cnq, kbb,
-   										            (cuDoubleComplex*)ALPHA, (cuDoubleComplex*)d_A, Cmp,
-									                                         (cuDoubleComplex*)d_B, kbb,
-  	                                                (cuDoubleComplex*)tbeta, (cuDoubleComplex*)d_C, Cmp)))    return;
-
-
-				  break;
-			  default:
-				  break;
-		  }
-
-//         gemm( C2F_CHAR( NOTRAN ), C2F_CHAR( NOTRAN ), &Cmp, &Cnq, &kbb,
-//               ALPHA, WA, &WAd0[LLD_], WB, &WBd0[LLD_], tbeta, Cptr, &Cld );
-
-         tbeta = one;
-      }
+          tbeta = one;
+        }
 
       Wkbb = 0;
    }
@@ -806,24 +801,24 @@ void PB_CpgemmAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
    {
       switch(TYPE->type)
       {
-	     case 'D':
-		    // DtoH
-		    if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(double), (double*)d_C, Cmp, Cptr, Cld))) return;
-		    // Deallocate
-		    cudaFree(d_A);
-		    cudaFree(d_B);
-		    cudaFree(d_C);
-		    break;
-	     case 'Z':
-		    // DtoH
-		    if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), (cuDoubleComplex*)d_C, Cmp, Cptr, Cld))) return;
-		    // Deallocate
-		    cudaFree(d_A);
-		    cudaFree(d_B);
-		    cudaFree(d_C);
-		    break;
-	     default:
-		    break;
+       case 'D':
+        // DtoH
+        if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(double), (double*)d_C, Cmp, Cptr, Cld))) return;
+        // Deallocate
+        cudaFree(d_A);
+        cudaFree(d_B);
+        cudaFree(d_C);
+        break;
+       case 'Z':
+        // DtoH
+        if(!checkCublasErrors(cublasGetMatrix(Cmp, Cnq, sizeof(cuDoubleComplex), (cuDoubleComplex*)d_C, Cmp, Cptr, Cld))) return;
+        // Deallocate
+        cudaFree(d_A);
+        cudaFree(d_B);
+        cudaFree(d_C);
+        break;
+       default:
+        break;
       }
    }
    cublasDestroy(handle);

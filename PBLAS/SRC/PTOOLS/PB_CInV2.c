@@ -17,12 +17,12 @@
 #include "../PBblas.h"
 
 #ifdef __STDC__
-void PB_CInV2( PBTYP_T * TYPE, char * CONJUG, char * ROWCOL, int M,
+void cuPB_CInV2( PBTYP_T * TYPE, char * CONJUG, char * ROWCOL, int M,
                int N, int * DESCA, int K, char * X, int IX, int JX,
                int * DESCX, char * XROC, char * XAPTR, int IJXA,
                int * DXA )
 #else
-void PB_CInV2( TYPE, CONJUG, ROWCOL, M, N, DESCA, K, X, IX, JX, DESCX,
+void cuPB_CInV2( TYPE, CONJUG, ROWCOL, M, N, DESCA, K, X, IX, JX, DESCX,
                XROC, XAPTR, IJXA, DXA )
 /*
 *  .. Scalar Arguments ..

@@ -802,28 +802,28 @@ void           pzgeadd_        ( F_CHAR_T,  int *,     int *,
                                  double *,  int *,     int *,
                                  int * );
 
-void           psgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
+void           cupsgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
                                  int *,     int *,     float *,
                                  float *,   int *,     int *,
                                  int *,     float *,   int *,
                                  int *,     int *,     float *,
                                  float *,   int *,     int *,
                                  int * );
-void           pdgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
+void           cupdgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
                                  int *,     int *,     double *,
                                  double *,  int *,     int *,
                                  int *,     double *,  int *,
                                  int *,     int *,     double *,
                                  double *,  int *,     int *,
                                  int * );
-void           pcgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
+void           cupcgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
                                  int *,     int *,     float *,
                                  float *,   int *,     int *,
                                  int *,     float *,   int *,
                                  int *,     int *,     float *,
                                  float *,   int *,     int *,
                                  int * );
-void           pzgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
+void           cupzgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
                                  int *,     int *,     double *,
                                  double *,  int *,     int *,
                                  int *,     double *,  int *,
@@ -1131,10 +1131,10 @@ void           pdgeadd_        ();
 void           pcgeadd_        ();
 void           pzgeadd_        ();
 
-void           psgemm_         ();
-void           pdgemm_         ();
-void           pcgemm_         ();
-void           pzgemm_         ();
+void           cupsgemm_         ();
+void           cupdgemm_         ();
+void           cupcgemm_         ();
+void           cupzgemm_         ();
 
 void           pssymm_         ();
 void           pdsymm_         ();

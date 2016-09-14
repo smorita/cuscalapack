@@ -56,7 +56,7 @@ include ../../SLmake_cuBLAS.inc
 
 all: single double complex complex16
 
-APPBLAS = pilaenv.o
+# APPBLAS = pilaenv.o
 
 #---------------------------------------------------------------------------
 #  Comment out the next 5 definitions if you already have the Level 1 PBLAS.
@@ -125,37 +125,37 @@ integer: $(PIBLAS)
 	$(RANLIB) ../../$(SCALAPACKLIB)
 
 single: integer $(PSBLAS)
-	( cd PBBLAS;  $(MAKE) single )
-	( cd PTZBLAS; $(MAKE) single )
+	# ( cd PBBLAS;  $(MAKE) single )
+	# ( cd PTZBLAS; $(MAKE) single )
 	( cd PTOOLS;  $(MAKE) single )
 	$(ARCH) $(ARCHFLAGS) ../../$(SCALAPACKLIB) $(PSBLAS)
 	$(RANLIB) ../../$(SCALAPACKLIB)
 
 double: integer $(PDBLAS)
-	( cd PBBLAS;  $(MAKE) double )
-	( cd PTZBLAS; $(MAKE) double )
+	# ( cd PBBLAS;  $(MAKE) double )
+	# ( cd PTZBLAS; $(MAKE) double )
 	( cd PTOOLS;  $(MAKE) double )
 	$(ARCH) $(ARCHFLAGS) ../../$(SCALAPACKLIB) $(PDBLAS)
 	$(RANLIB) ../../$(SCALAPACKLIB)
 
 complex: integer $(PCBLAS)
-	( cd PBBLAS;  $(MAKE) complex )
-	( cd PTZBLAS; $(MAKE) complex )
+	# ( cd PBBLAS;  $(MAKE) complex )
+	# ( cd PTZBLAS; $(MAKE) complex )
 	( cd PTOOLS;  $(MAKE) complex )
 	$(ARCH) $(ARCHFLAGS) ../../$(SCALAPACKLIB) $(PCBLAS)
 	$(RANLIB) ../../$(SCALAPACKLIB)
 
 complex16: integer $(PZBLAS)
-	( cd PBBLAS;  $(MAKE) complex16 )
-	( cd PTZBLAS; $(MAKE) complex16 )
+	# ( cd PBBLAS;  $(MAKE) complex16 )
+	# ( cd PTZBLAS; $(MAKE) complex16 )
 	( cd PTOOLS;  $(MAKE) complex16 )
 	$(ARCH) $(ARCHFLAGS) ../../$(SCALAPACKLIB) $(PZBLAS)
 	$(RANLIB) ../../$(SCALAPACKLIB)
 
 clean :
 	rm -f *.o
-	( cd PBBLAS;  $(MAKE) clean )
-	( cd PTZBLAS; $(MAKE) clean )
+	# ( cd PBBLAS;  $(MAKE) clean )
+	# ( cd PTZBLAS; $(MAKE) clean )
 	( cd PTOOLS;  $(MAKE) clean )
 
 .f.o : ; $(FC) -c $(FCFLAGS) $*.f

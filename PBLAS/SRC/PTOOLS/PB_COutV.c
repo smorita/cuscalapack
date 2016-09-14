@@ -17,11 +17,11 @@
 #include "../PBblas.h"
 
 #ifdef __STDC__
-void PB_COutV( PBTYP_T * TYPE, char * ROWCOL, char * ZEROIT, int M,
+void cuPB_COutV( PBTYP_T * TYPE, char * ROWCOL, char * ZEROIT, int M,
                int N, int * DESCA, int K, char * * YAPTR, int * DYA,
                int * YAFREE, int * YASUM )
 #else
-void PB_COutV( TYPE, ROWCOL, ZEROIT, M, N, DESCA, K, YAPTR, DYA,
+void cuPB_COutV( TYPE, ROWCOL, ZEROIT, M, N, DESCA, K, YAPTR, DYA,
                YAFREE, YASUM )
 /*
 *  .. Scalar Arguments ..
@@ -235,7 +235,7 @@ void PB_COutV( TYPE, ROWCOL, ZEROIT, M, N, DESCA, K, YAPTR, DYA,
 */
          if( Anq > 0 )
          {
-            *YAPTR  = PB_Cmalloc( K * Anq * TYPE->size );
+            *YAPTR  = cuPB_Cmalloc( K * Anq * TYPE->size );
             *YAFREE = 1;
             if( Mupcase( ZEROIT[0] ) == CINIT )
             {
@@ -258,7 +258,7 @@ void PB_COutV( TYPE, ROWCOL, ZEROIT, M, N, DESCA, K, YAPTR, DYA,
          *YASUM = 0;
          if( ( myrow == Arow ) && ( Anq > 0 ) )
          {
-            *YAPTR  = PB_Cmalloc( K * Anq * TYPE->size );
+            *YAPTR  = cuPB_Cmalloc( K * Anq * TYPE->size );
             *YAFREE = 1;
             if( Mupcase( ZEROIT[0] ) == CINIT )
             {
@@ -296,7 +296,7 @@ void PB_COutV( TYPE, ROWCOL, ZEROIT, M, N, DESCA, K, YAPTR, DYA,
 */
          if( Amp > 0 )
          {	
-            *YAPTR  = PB_Cmalloc( Amp * K * TYPE->size );
+            *YAPTR  = cuPB_Cmalloc( Amp * K * TYPE->size );
             *YAFREE = 1;
             if( Mupcase( ZEROIT[0] ) == CINIT )
             {
@@ -319,7 +319,7 @@ void PB_COutV( TYPE, ROWCOL, ZEROIT, M, N, DESCA, K, YAPTR, DYA,
          *YASUM = 0;
          if( ( mycol == Acol ) && ( Amp > 0 ) )
          {
-            *YAPTR  = PB_Cmalloc( Amp * K * TYPE->size );
+            *YAPTR  = cuPB_Cmalloc( Amp * K * TYPE->size );
             *YAFREE = 1;
             if( Mupcase( ZEROIT[0] ) == CINIT )
             {

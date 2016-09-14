@@ -307,7 +307,7 @@ void pzgemm_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
 /*
 *  Get type structure
 */
-   type = PB_Cztypeset();
+   type = cuPB_Cztypeset();
 /*
 *  If alpha or K is zero, sub( C ) := beta * sub( C ).
 */
@@ -476,7 +476,7 @@ void pzgemm_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
 
    if( ChooseAB )
    {
-      PB_CpgemmAB( type, &DirAB, &DirBC, ( nota ? NOTRAN :
+      cuPB_CpgemmAB( type, &DirAB, &DirBC, ( nota ? NOTRAN :
                    ( ( TrA == CCOTRAN ) ? COTRAN : TRAN ) ), ( notb ? NOTRAN :
                    ( ( TrB == CCOTRAN ) ? COTRAN : TRAN ) ), *M, *N, *K,
                    ((char *)ALPHA), ((char *)A), Ai, Aj, Ad, ((char *)B), Bi,
@@ -484,7 +484,7 @@ void pzgemm_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
    }
    else if( ChooseBC )
    {
-      PB_CpgemmBC( type, &DirAB, &DirBC, ( nota ? NOTRAN :
+      cuPB_CpgemmBC( type, &DirAB, &DirBC, ( nota ? NOTRAN :
                    ( ( TrA == CCOTRAN ) ? COTRAN : TRAN ) ), ( notb ? NOTRAN :
                    ( ( TrB == CCOTRAN ) ? COTRAN : TRAN ) ), *M, *N, *K,
                    ((char *)ALPHA), ((char *)A), Ai, Aj, Ad, ((char *)B), Bi,
@@ -492,7 +492,7 @@ void pzgemm_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
    }
    else
    {
-      PB_CpgemmAC( type, &DirAB, &DirBC, ( nota ? NOTRAN :
+      cuPB_CpgemmAC( type, &DirAB, &DirBC, ( nota ? NOTRAN :
                    ( ( TrA == CCOTRAN ) ? COTRAN : TRAN ) ), ( notb ? NOTRAN :
                    ( ( TrB == CCOTRAN ) ? COTRAN : TRAN ) ), *M, *N, *K,
                    ((char *)ALPHA), ((char *)A), Ai, Aj, Ad, ((char *)B), Bi,

@@ -16,7 +16,7 @@
 #include "../PBblacs.h"
 #include "../PBblas.h"
 
-PBTYP_T * PB_Cctypeset()
+PBTYP_T * cuPB_Cctypeset()
 {
 /*
 *  Purpose

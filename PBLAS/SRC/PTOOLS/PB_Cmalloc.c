@@ -17,9 +17,9 @@
 #include "../PBblas.h"
 
 #ifdef __STDC__
-char * PB_Cmalloc( int LENGTH )
+char * cuPB_Cmalloc( int LENGTH )
 #else
-char * PB_Cmalloc( LENGTH )
+char * cuPB_Cmalloc( LENGTH )
 /*
 *  .. Scalar Arguments ..
 */

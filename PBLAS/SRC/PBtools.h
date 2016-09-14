@@ -1389,7 +1389,7 @@ void           PB_Cptrsm       ( PBTYP_T *, int,       char *,
                                  int *,     char *,    int,
                                  char *,    int );
 
-void           PB_CpgemmAB     ( PBTYP_T *, char *,    char *,
+void           cuPB_CpgemmAB     ( PBTYP_T *, char *,    char *,
                                  char *,    char *,    int,
                                  int,       int,       char *,
                                  char *,    int,       int,
@@ -1397,7 +1397,7 @@ void           PB_CpgemmAB     ( PBTYP_T *, char *,    char *,
                                  int,       int *,     char *,
                                  char *,    int,       int,
                                  int * );
-void           PB_CpgemmAC     ( PBTYP_T *, char *,    char *,
+void           cuPB_CpgemmAC     ( PBTYP_T *, char *,    char *,
                                  char *,    char *,    int,
                                  int,       int,       char *,
                                  char *,    int,       int,
@@ -1405,7 +1405,7 @@ void           PB_CpgemmAC     ( PBTYP_T *, char *,    char *,
                                  int,       int *,     char *,
                                  char *,    int,       int,
                                  int * );
-void           PB_CpgemmBC     ( PBTYP_T *, char *,    char *,
+void           cuPB_CpgemmBC     ( PBTYP_T *, char *,    char *,
                                  char *,    char *,    int,
                                  int,       int,       char *,
                                  char *,    int,       int,
@@ -1654,9 +1654,9 @@ void           PB_Cptran       ();
 void           PB_Cptrsv       ();
 void           PB_Cptrsm       ();
 
-void           PB_CpgemmAB     ();
-void           PB_CpgemmAC     ();
-void           PB_CpgemmBC     ();
+void           cuPB_CpgemmAB     ();
+void           cuPB_CpgemmAC     ();
+void           cuPB_CpgemmBC     ();
 void           PB_CpsymmAB     ();
 void           PB_CpsymmBC     ();
 void           PB_CpsyrkA      ();
@@ -1737,14 +1737,14 @@ void           PB_Cchkvec      ( int,       char *,    char *,
                                  int,       int *,     int,
                                  int,       int * );
 
-char *         PB_Cmalloc      ( int );
+char *         cuPB_Cmalloc      ( int );
 char *         PB_Cgetbuf      ( char *,    int );
 
-PBTYP_T *      PB_Citypeset    ( void );
-PBTYP_T *      PB_Cstypeset    ( void );
-PBTYP_T *      PB_Cdtypeset    ( void );
-PBTYP_T *      PB_Cctypeset    ( void );
-PBTYP_T *      PB_Cztypeset    ( void );
+PBTYP_T *      cuPB_Citypeset    ( void );
+PBTYP_T *      cuPB_Cstypeset    ( void );
+PBTYP_T *      cuPB_Cdtypeset    ( void );
+PBTYP_T *      cuPB_Cctypeset    ( void );
+PBTYP_T *      cuPB_Cztypeset    ( void );
 
 int            pilaenv_        ( int *,     F_CHAR_T );
 char *         PB_Ctop         ( int *,     char *,    char *,
@@ -1815,12 +1815,12 @@ void           PB_Cplacnjg     ( PBTYP_T *, int,       int,
                                  char *,    char *,    int,
                                  int,       int * );
 
-void           PB_CInV         ( PBTYP_T *, char *,    char *,
+void           cuPB_CInV         ( PBTYP_T *, char *,    char *,
                                  int,       int,       int *,
                                  int,       char *,    int,
                                  int,       int *,     char *,
                                  char * *,  int *,     int * );
-void           PB_CInV2        ( PBTYP_T *, char *,    char *,
+void           cuPB_CInV2        ( PBTYP_T *, char *,    char *,
                                  int,       int,       int *,
                                  int,       char *,    int,
                                  int,       int *,     char *,
@@ -1837,7 +1837,7 @@ void           PB_CInOutV2     ( PBTYP_T *, char *,    char *,
                                  int,       int,       int *,
                                  char *,    char * *,  int *,
                                  int *,     int *,     int * );
-void           PB_COutV        ( PBTYP_T *, char *,    char *,
+void           cuPB_COutV        ( PBTYP_T *, char *,    char *,
                                  int,       int,       int *,
                                  int,       char * *,  int *,
                                  int *,     int * );
@@ -1878,14 +1878,14 @@ void           PB_Cabort       ();
 void           PB_Cchkmat      ();
 void           PB_Cchkvec      ();
 
-char *         PB_Cmalloc      ();
+char *         cuPB_Cmalloc      ();
 char *         PB_Cgetbuf      ();
 
-PBTYP_T *      PB_Citypeset    ();
-PBTYP_T *      PB_Cstypeset    ();
-PBTYP_T *      PB_Cdtypeset    ();
-PBTYP_T *      PB_Cctypeset    ();
-PBTYP_T *      PB_Cztypeset    ();
+PBTYP_T *      cuPB_Citypeset    ();
+PBTYP_T *      cuPB_Cstypeset    ();
+PBTYP_T *      cuPB_Cdtypeset    ();
+PBTYP_T *      cuPB_Cctypeset    ();
+PBTYP_T *      cuPB_Cztypeset    ();
 
 int            pilaenv_        ();
 char *         PB_Ctop         ();
@@ -1910,11 +1910,11 @@ void           PB_Cplascal     ();
 void           PB_Cplasca2     ();
 void           PB_Cplacnjg     ();
 
-void           PB_CInV         ();
-void           PB_CInV2        ();
+void           cuPB_CInV         ();
+void           cuPB_CInV2        ();
 void           PB_CInOutV      ();
 void           PB_CInOutV2     ();
-void           PB_COutV        ();
+void           cuPB_COutV        ();
 void           PB_CGatherV     ();
 void           PB_CScatterV    ();
 

@@ -17,13 +17,13 @@
 #include "../PBblas.h"
 
 #ifdef __STDC__
-void PB_CpgemmBC( PBTYP_T * TYPE, char * DIRECB, char * DIRECC,
+void cuPB_CpgemmBC( PBTYP_T * TYPE, char * DIRECB, char * DIRECC,
                   char * TRANSA, char * TRANSB, int M, int N, int K,
                   char * ALPHA, char * A, int IA, int JA, int * DESCA,
                   char * B, int IB, int JB, int * DESCB, char * BETA,
                   char * C, int IC, int JC, int * DESCC )
 #else
-void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
+void cuPB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
                   A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
                   DESCC )
 /*
@@ -349,7 +349,7 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
       top    = *PB_Ctop( &ctxt, COMBINE, COLUMN, TOP_GET );
       if( TrA == CCOTRAN )
       {
-         talpha = PB_Cmalloc( size ); PB_Cconjg( TYPE, ALPHA, talpha );
+         talpha = cuPB_Cmalloc( size ); PB_Cconjg( TYPE, ALPHA, talpha );
          GemmTa = ( ( TrB == CCOTRAN ) ? CTRAN : CCOTRAN );
       }
       else
@@ -445,7 +445,7 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
                Bbufld = MAX( 1, BnpD );
                if( BisR || ( BmyprocR == BcurrocR ) )
                {
-                  Bbuf   = PB_Cmalloc( BnpD * nbb * size );
+                  Bbuf   = cuPB_Cmalloc( BnpD * nbb * size );
                   PB_CVMpack( TYPE, &VM, COLUMN, &Broc, PACKING, NOTRAN, nbb,
                               BnpD, one, Mptr( B, BiiD, Bkk,  Bld, size ), Bld,
                               zero, Bbuf, Bbufld );
@@ -478,7 +478,7 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
                Bbufld = nbb;
                if( BisR || ( BmyprocR == BcurrocR ) )
                {
-                  Bbuf   = PB_Cmalloc( BnpD * nbb * size );
+                  Bbuf   = cuPB_Cmalloc( BnpD * nbb * size );
                   PB_CVMpack( TYPE, &VM, COLUMN, &Broc, PACKING, NOTRAN, nbb,
                               BnpD, one, Mptr( B, Bkk,  BiiD, Bld, size ), Bld,
                               zero, Bbuf, Bbufld );
@@ -502,12 +502,12 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
 /*
 *  Replicate this panel of rows or columns of sub( B ) over sub( A ) -> WB
 */
-            PB_CInV( TYPE, NOCONJG, ROW,    Am, An, Ad0, nbb, Bbuf, 0, 0,
+            cuPB_CInV( TYPE, NOCONJG, ROW,    Am, An, Ad0, nbb, Bbuf, 0, 0,
                      DBUFB, &Broc, &WB, WBd, &WBfr );
 /*
 *  Allocate space for temporary results in scope of sub( A ) -> WC
 */
-            PB_COutV( TYPE, COLUMN, INIT, Am, An, Ad0, nbb, &WC, WCd, &WCfr,
+            cuPB_COutV( TYPE, COLUMN, INIT, Am, An, Ad0, nbb, &WC, WCd, &WCfr,
                       &WCsum );
 /*
 *  Local matrix-matrix multiply iff I own some data
@@ -540,7 +540,7 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
 */
                Cbufld = MAX( 1, Cmp );  tbeta = zero;
                if( CisR || ( mycol == Ccurcol ) )
-                  Cbuf = PB_Cmalloc( Cmp * nbb * size );
+                  Cbuf = cuPB_Cmalloc( Cmp * nbb * size );
             }
             else
             {
@@ -575,12 +575,12 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
 /*
 *  Replicate this panel of rows or columns of sub( B ) over sub( A ) -> WB
 */
-            PB_CInV( TYPE, NOCONJG, COLUMN, Am, An, Ad0, nbb, Bbuf, 0, 0,
+            cuPB_CInV( TYPE, NOCONJG, COLUMN, Am, An, Ad0, nbb, Bbuf, 0, 0,
                      DBUFB, &Broc, &WB, WBd, &WBfr );
 /*
 *  Allocate space for temporary results in scope of sub( A ) -> WC
 */
-            PB_COutV( TYPE, ROW,    INIT, Am, An, Ad0, nbb, &WC, WCd, &WCfr,
+            cuPB_COutV( TYPE, ROW,    INIT, Am, An, Ad0, nbb, &WC, WCd, &WCfr,
                       &WCsum );
 /*
 *  Local matrix-matrix multiply iff I own some data
@@ -613,7 +613,7 @@ void PB_CpgemmBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
 */
                Cbufld = MAX( 1, Cmp );  tbeta = zero;
                if( CisR || ( mycol == Ccurcol ) )
-                  Cbuf = PB_Cmalloc( Cmp * nbb * size );
+                  Cbuf = cuPB_Cmalloc( Cmp * nbb * size );
             }
             else
             {

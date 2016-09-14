@@ -306,7 +306,7 @@ void pdgemm_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
 /*
 *  Get type structure
 */
-   type = PB_Cdtypeset();
+   type = cuPB_Cdtypeset();
 /*
 *  If alpha or K is zero, sub( C ) := beta * sub( C ).
 */
@@ -473,21 +473,21 @@ void pdgemm_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
 
    if( ChooseAB )
    {
-      PB_CpgemmAB( type, &DirAB, &DirBC, ( nota ? NOTRAN : TRAN ), ( notb ?
+      cuPB_CpgemmAB( type, &DirAB, &DirBC, ( nota ? NOTRAN : TRAN ), ( notb ?
                    NOTRAN : TRAN ), *M, *N, *K, ((char *)ALPHA), ((char *)A),
                    Ai, Aj, Ad, ((char *)B), Bi, Bj, Bd, ((char *)BETA),
                    ((char *)C), Ci, Cj, Cd );
    }
    else if( ChooseBC )
    {
-      PB_CpgemmBC( type, &DirAB, &DirBC, ( nota ? NOTRAN : TRAN ), ( notb ?
+      cuPB_CpgemmBC( type, &DirAB, &DirBC, ( nota ? NOTRAN : TRAN ), ( notb ?
                    NOTRAN : TRAN ), *M, *N, *K, ((char *)ALPHA), ((char *)A),
                    Ai, Aj, Ad, ((char *)B), Bi, Bj, Bd, ((char *)BETA),
                    ((char *)C), Ci, Cj, Cd );
    }
    else
    {
-      PB_CpgemmAC( type, &DirAB, &DirBC, ( nota ? NOTRAN : TRAN ), ( notb ?
+      cuPB_CpgemmAC( type, &DirAB, &DirBC, ( nota ? NOTRAN : TRAN ), ( notb ?
                    NOTRAN : TRAN ), *M, *N, *K, ((char *)ALPHA), ((char *)A),
                    Ai, Aj, Ad, ((char *)B), Bi, Bj, Bd, ((char *)BETA),
                    ((char *)C), Ci, Cj, Cd );
